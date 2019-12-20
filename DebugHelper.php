@@ -55,7 +55,7 @@ class DebugHelper
      * @param mixed $params
      * @return void
      */
-    public static function call(callable $func, $params)
+    public static function call(callable $func, $params = [])
     {
         $show = isset($_COOKIE[self::$mainKey]);
         if (!$show) $show = isset($_GET[self::$mainKey]);
