@@ -6,7 +6,7 @@ namespace darkfriend\helpers;
  * Class DebugHelper
  * @package darkfriend\helpers
  * @author darkfriend <hi@darkfriend.ru>
- * @version 1.0.0
+ * @version 1.0.2
  */
 class DebugHelper
 {
@@ -86,7 +86,14 @@ class DebugHelper
                 $flag = \FILE_APPEND;
         }
 
-        $file = $_SERVER['DOCUMENT_ROOT'] . self::$pathLog . self::$hashName . 'trace.log';
+//        if(strpos($_SERVER['DOCUMENT_ROOT'],self::$pathLog)) {
+//            $file = $_SERVER['DOCUMENT_ROOT'] . self::$pathLog . self::$hashName . 'trace.log';
+//        } else {
+//            $file = self::$pathLog . self::$hashName . 'trace.log';
+//        }
+
+        $file = self::getFile();
+
         if (!\is_dir(\dirname($file))) {
             @mkdir(\dirname($file), 0777, true);
         }
@@ -101,6 +108,27 @@ class DebugHelper
             . "\n------TRACE_END------.\n\n\n\n",
             $flag
         );
+    }
+
+    /**
+     * Return path to file
+     * @return string
+     * @since 1.0.2
+     */
+    public static function getFile()
+    {
+        if(strpos(self::$pathLog, $_SERVER['DOCUMENT_ROOT'])) {
+            $file = self::$pathLog;
+        } else {
+            $file = $_SERVER['DOCUMENT_ROOT'] . self::$pathLog;
+        }
+
+        if(!strpos(self::$pathLog,'.log')) {
+            $file = rtrim($file);
+            $file .= '/'. self::$hashName . 'trace.log';
+        }
+
+        return $file;
     }
 
     /**
