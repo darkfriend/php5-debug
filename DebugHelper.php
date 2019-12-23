@@ -6,7 +6,7 @@ namespace darkfriend\helpers;
  * Class DebugHelper
  * @package darkfriend\helpers
  * @author darkfriend <hi@darkfriend.ru>
- * @version 1.0.2
+ * @version 1.0.3
  */
 class DebugHelper
 {
@@ -117,13 +117,13 @@ class DebugHelper
      */
     public static function getFile()
     {
-        if(strpos(self::$pathLog, $_SERVER['DOCUMENT_ROOT'])) {
+        if(strpos(self::$pathLog, $_SERVER['DOCUMENT_ROOT']) !== false) {
             $file = self::$pathLog;
         } else {
             $file = $_SERVER['DOCUMENT_ROOT'] . self::$pathLog;
         }
 
-        if(!strpos(self::$pathLog,'.log')) {
+        if(strpos(self::$pathLog,'.log')===false) {
             $file = rtrim($file);
             $file .= '/'. self::$hashName . 'trace.log';
         }
