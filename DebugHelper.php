@@ -12,6 +12,7 @@ class DebugHelper
 {
     public static $mainKey = 'ADMIN';
     public static $traceMode;
+    public static $fileSizeRotate = 30;
 
     protected static $pathLog = '/';
     protected static $hashName;
@@ -80,10 +81,10 @@ class DebugHelper
 
         switch (self::$traceMode) {
             case self::TRACE_MODE_REPLACE:
-                $flag = \FILE_BINARY;
+                $flag = \FILE_BINARY | \LOCK_EX;
                 break;
             default:
-                $flag = \FILE_APPEND;
+                $flag = \FILE_APPEND | \LOCK_EX;
         }
 
 //        if(strpos($_SERVER['DOCUMENT_ROOT'],self::$pathLog)) {
@@ -97,6 +98,8 @@ class DebugHelper
         if (!\is_dir(\dirname($file))) {
             @mkdir(\dirname($file), 0777, true);
         }
+
+        LogRotate::process($file, static::$fileSizeRotate);
 
         \file_put_contents(
             $file,
