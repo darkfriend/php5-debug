@@ -6,7 +6,7 @@ namespace darkfriend\helpers;
  * Class DebugHelper
  * @package darkfriend\helpers
  * @author darkfriend <hi@darkfriend.ru>
- * @version 1.0.3
+ * @version 1.0.5
  */
 class DebugHelper
 {
@@ -14,8 +14,12 @@ class DebugHelper
     public static $traceMode;
     public static $fileSizeRotate = 30;
 
+    /** @var string */
     protected static $pathLog = '/';
+    /** @var string */
     protected static $hashName;
+    /** @var string */
+    protected static $root;
 
     const TRACE_MODE_REPLACE = 1;
     const TRACE_MODE_APPEND = 2;
@@ -120,10 +124,10 @@ class DebugHelper
      */
     public static function getFile()
     {
-        if(strpos(self::$pathLog, $_SERVER['DOCUMENT_ROOT']) !== false) {
+        if(strpos(self::$pathLog, self::getRoot()) !== false) {
             $file = self::$pathLog;
         } else {
-            $file = $_SERVER['DOCUMENT_ROOT'] . self::$pathLog;
+            $file = self::getRoot() . self::$pathLog;
         }
 
         if(strpos(self::$pathLog,'.log')===false) {
@@ -182,5 +186,25 @@ class DebugHelper
                 self::generateHashSession();
             }
         }
+    }
+
+    /**
+     * Set root directory
+     * @param string $str
+     * @since 1.0.5
+     */
+    public static function setRoot($str)
+    {
+        self::$root = $str;
+    }
+
+    /**
+     * Get root directory
+     * @return string
+     * @since 1.0.5
+     */
+    public static function getRoot()
+    {
+        return self::$root ? self::$root : $_SERVER['DOCUMENT_ROOT'];
     }
 }
