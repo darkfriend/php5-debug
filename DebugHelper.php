@@ -6,12 +6,13 @@ namespace darkfriend\helpers;
  * Class DebugHelper
  * @package darkfriend\helpers
  * @author darkfriend <hi@darkfriend.ru>
- * @version 1.0.5
+ * @version 1.0.6
  */
 class DebugHelper
 {
     public static $mainKey = 'ADMIN';
     public static $traceMode;
+    /** @var int value in Mb */
     public static $fileSizeRotate = 30;
 
     /** @var string */
@@ -41,16 +42,18 @@ class DebugHelper
         $bt["file"] = \str_replace($dRoot, "", $bt["file"]);
         $dRoot = \str_replace("\\", "/", $dRoot);
         $bt["file"] = \str_replace($dRoot, "", $bt["file"]);
-        if (!$show && !empty($_COOKIE[self::$mainKey])) $show = true;
-        if (!$show) return;
-        ?>
-        <div style='font-size:9pt; color:#000; background:#fff; border:1px dashed #000;'>
-            <div style='padding:3px 5px; background:#99CCFF; font-weight:bold;'>File: <?= $bt["file"] ?>
-                [<?= $bt["line"] ?>]
-            </div>
-            <pre style='padding:10px;'><?= \htmlentities(\print_r($o, true)) ?></pre>
-        </div>
-        <?php
+
+        if(!self::isCli()) {
+            if (!$show && !empty($_COOKIE[self::$mainKey])) {
+                $show = true;
+            }
+            if (!$show) return;
+            echo self::getOutputPreWeb($o, $bt);
+        } else {
+            if (!$show) return;
+            echo self::getOutputPreCli($o, $bt);
+        }
+
         if ($die) die();
     }
 
@@ -206,5 +209,85 @@ class DebugHelper
     public static function getRoot()
     {
         return self::$root ? self::$root : $_SERVER['DOCUMENT_ROOT'];
+    }
+
+    /**
+     * Output formatted <pre>.
+     * Wrap for print_pre()
+     * @param $o
+     * @param bool $die
+     * @param bool $show
+     * @see print_pre()
+     * @since 1.0.6
+     */
+    public static function pre($o, $die = false, $show = true)
+    {
+        self::print_pre($o, $die, $show);
+    }
+
+    /**
+     * Get output string print_pre for web
+     * @param mixed $o
+     * @param array $bt
+     * @return string
+     * @since 1.0.6
+     */
+    protected static function getOutputPreWeb($o, $bt)
+    {
+        return "
+        <div style='font-size:9pt; color:#000; background:#fff; border:1px dashed #000;'>
+            <div style='padding:3px 5px; background:#99CCFF; font-weight:bold;'>File: {$bt['file']}
+                [{$bt['line']}]
+            </div>
+            <pre style='padding:10px;'>".self::getOutputPre($o)."</pre>
+        </div>
+        ";
+    }
+
+    /**
+     * Get output string print_pre for cli
+     * @param mixed $o
+     * @param array $bt
+     * @return string
+     * @since 1.0.6
+     */
+    protected static function getOutputPreCli($o, $bt)
+    {
+        return self::getOutputPre($o);
+    }
+
+    /**
+     * Get output string
+     * @param mixed $o
+     * @return string
+     * @since 1.0.6
+     */
+    protected static function getOutputPre($o)
+    {
+        if(self::isCli()) {
+            return \print_r($o, true);
+        } else {
+            return \htmlentities(\print_r($o, true));
+        }
+    }
+
+    /**
+     * Checked of cli
+     * @return bool
+     * @since 1.0.6
+     */
+    protected static function isCli()
+    {
+        return self::getMode()=='cli';
+    }
+
+    /**
+     * Get mode script
+     * @return string
+     * @since 1.0.6
+     */
+    protected static function getMode()
+    {
+        return \php_sapi_name();
     }
 }
